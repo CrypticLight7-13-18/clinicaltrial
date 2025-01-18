@@ -3,6 +3,7 @@ import AuthPages from "./pages/auth";
 import CreateTrialPage from "./pages/addTrial";
 import AddParticipantPage from "./pages/addParticipant";
 import TrialDashboard from "./pages/trials";
+import ParticipantDashboard from "./pages/participantDashboard";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/trials" element={<TrialDashboard />} />
           <Route path="/add-trial" element={<CreateTrialPage />} />
           <Route path="/add-participant" element={<AddParticipantPage />} />
+          <Route path="/participant-dashboard" element={<ParticipantDashboard />} />
         </Routes>
       </BrowserRouter>
     </div>
