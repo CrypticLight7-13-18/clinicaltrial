@@ -67,7 +67,7 @@ interface HealthData {
 }
 
 const TrialDashboard = () => {
-  const [selectedTrial, setSelectedTrial] = useState(null);
+  const [selectedTrial, setSelectedTrial] = useState<Trial | null>(null);
   const [data, setData] = useState<{
     trials: Trial[];
     participants: Participant[];
@@ -79,6 +79,11 @@ const TrialDashboard = () => {
     visits: [],
     healthData: [],
   });
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredTrials = data.trials.filter((trial) =>
+    trial.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   useEffect(() => {
     const generatedData = generateDummyData(10, 50);
@@ -92,45 +97,57 @@ const TrialDashboard = () => {
       </div>
     );
 
-  const TrialsList = () => (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Clinical Trials Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.trials.map((trial: any) => (
-          <Card
-            key={trial.id}
-            className="cursor-pointer hover:shadow-lg transition-shadow duration-300"
-            onClick={() => setSelectedTrial(trial)}
-          >
-            <CardHeader>
-              <CardTitle className="text-lg">{trial.title}</CardTitle>
-              <CardDescription>{trial.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    Started: {new Date(trial.start_date).toLocaleDateString()}
-                  </span>
+    const TrialsList = () => (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">Clinical Trials Dashboard</h1>
+        
+        {/* Add Search Bar */}
+        <input
+          type="text"
+          placeholder="Search Trials..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="p-2 border rounded-md w-full mb-4"
+        />
+    
+        {/* Display Trials */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredTrials.map((trial) => (
+            <Card
+              key={trial.id}
+              className="cursor-pointer hover:shadow-lg transition-shadow duration-300"
+              onClick={() => setSelectedTrial(trial)}
+            >
+              <CardHeader>
+                <CardTitle className="text-lg">{trial.title}</CardTitle>
+                <CardDescription>{trial.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>
+                      Started: {new Date(trial.start_date).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    <span>
+                      {
+                        data.participants.filter((p) => p.trial_id === trial.id)
+                          .length
+                      }{" "}
+                      Participants
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  <span>
-                    {
-                      data.participants.filter((p) => p.trial_id === trial.id)
-                        .length
-                    }{" "}
-                    Participants
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+    
 
   const TrialDetails = ({ trial }: { trial: Trial }) => {
     const trialParticipants = data.participants.filter(
