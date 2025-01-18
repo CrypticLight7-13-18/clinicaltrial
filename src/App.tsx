@@ -6,7 +6,7 @@ import TrialDashboard from './pages/trials'
 function App() {
 
   return (
-      // <AuthPages />
+      <AuthPages />
       // <CreateTrialPage />
       // <AddParticipantPage />
       // <TrialDashboard />
