@@ -1,49 +1,83 @@
-import  { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { LineChart, BarChart, XAxis, YAxis, Tooltip, Bar, Line, ResponsiveContainer } from 'recharts';
-import { Users, UserCheck, Activity, Calendar } from 'lucide-react';
-import { generateDummyData } from '@/lib/utils';
+import {
+  LineChart,
+  BarChart,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Bar,
+  Line,
+  ResponsiveContainer,
+} from "recharts";
+import { Users, UserCheck, Activity, Calendar } from "lucide-react";
+import { generateDummyData } from "@/lib/utils";
 
 interface Trial {
-    id: number;
-    title: string;
-    description: string;
-    start_date: string;
+  id: string;
+  title: string;
+  description: string;
+  start_date: Date;
+  end_date: Date;
+  created_by: string;
 }
 
 interface Participant {
-    id: number;
-    trial_id: number;
-    full_name: string;
-    gender: string;
-    dob: string;
-    email: string;
-    phone_number: string;
+  id: string;
+  full_name: string;
+  dob: Date;
+  gender: string;
+  marital_status: string;
+  address: string;
+  postal_code: string;
+  phone_number: string;
+  email: string;
+  employment_status: string;
+  occupation: string;
+  trial_id: string;
 }
 
 interface Visit {
-    id: number;
-    participant_id: number;
-    status: string;
+  id: string;
+  participant_id: string;
+  scheduled_date: Date;
+  status: string;
 }
 
 interface HealthData {
-    id: number;
-    visit_id: number;
-    heart_rate: number;
-    blood_glucose_level: number;
-    oxygen_saturation: number;
-    weight: number;
+  id: string;
+  visit_id: string;
+  heart_rate: number;
+  blood_pressure: string;
+  respiratory_rate: number;
+  body_temperature: number;
+  oxygen_saturation: number;
+  weight: number;
+  height: number;
+  ecg: string;
+  blood_glucose_level: number;
+  urine_output: number;
 }
 
 const TrialDashboard = () => {
   const [selectedTrial, setSelectedTrial] = useState(null);
-  const [data, setData] = useState<{ trials: Trial[], participants: Participant[], visits: Visit[], healthData: HealthData[] }>({
+  const [data, setData] = useState<{
+    trials: Trial[];
+    participants: Participant[];
+    visits: Visit[];
+    healthData: HealthData[];
+  }>({
     trials: [],
     participants: [],
     visits: [],
-    healthData: []
+    healthData: [],
   });
 
   useEffect(() => {
@@ -51,15 +85,20 @@ const TrialDashboard = () => {
     setData(generatedData);
   }, []);
 
-  if (!data) return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  if (!data)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
 
   const TrialsList = () => (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Clinical Trials Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.trials.map((trial:any) => (
-          <Card 
-            key={trial.id} 
+        {data.trials.map((trial: any) => (
+          <Card
+            key={trial.id}
             className="cursor-pointer hover:shadow-lg transition-shadow duration-300"
             onClick={() => setSelectedTrial(trial)}
           >
@@ -71,12 +110,18 @@ const TrialDashboard = () => {
               <div className="space-y-2 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  <span>Started: {new Date(trial.start_date).toLocaleDateString()}</span>
+                  <span>
+                    Started: {new Date(trial.start_date).toLocaleDateString()}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4" />
                   <span>
-                    {data.participants.filter(p => p.trial_id === trial.id).length} Participants
+                    {
+                      data.participants.filter((p) => p.trial_id === trial.id)
+                        .length
+                    }{" "}
+                    Participants
                   </span>
                 </div>
               </div>
@@ -87,29 +132,34 @@ const TrialDashboard = () => {
     </div>
   );
 
-  const TrialDetails = ({ trial }) => {
-    const trialParticipants = data.participants.filter(p => p.trial_id === trial.id);
-    const trialVisits = data.visits.filter(v => 
-      trialParticipants.some(p => p.id === v.participant_id)
+  const TrialDetails = ({ trial }: { trial: Trial }) => {
+    const trialParticipants = data.participants.filter(
+      (p) => p.trial_id === trial.id
     );
-    const trialHealthData = data.healthData.filter(h => 
-      trialVisits.some(v => v.id === h.visit_id)
+    const trialVisits = data.visits.filter((v) =>
+      trialParticipants.some((p) => p.id === v.participant_id)
+    );
+    const trialHealthData = data.healthData.filter((h) =>
+      trialVisits.some((v) => v.id === h.visit_id)
     );
 
-    const healthMetrics = trialHealthData.map(d => ({
+    const healthMetrics = trialHealthData.map((d) => ({
       heartRate: d.heart_rate,
       bloodGlucose: d.blood_glucose_level,
       oxygenSaturation: d.oxygen_saturation,
-      weight: d.weight
+      weight: d.weight,
     }));
 
     const aggregatedData = {
       totalParticipants: trialParticipants.length,
-      completedVisits: trialVisits.filter(v => v.status === 'Completed').length,
-      scheduledVisits: trialVisits.filter(v => v.status === 'Scheduled').length,
+      completedVisits: trialVisits.filter((v) => v.status === "Completed")
+        .length,
+      scheduledVisits: trialVisits.filter((v) => v.status === "Scheduled")
+        .length,
       averageHeartRate: Math.round(
-        healthMetrics.reduce((acc, curr) => acc + curr.heartRate, 0) / healthMetrics.length
-      )
+        healthMetrics.reduce((acc, curr) => acc + curr.heartRate, 0) /
+          healthMetrics.length
+      ),
     };
 
     return (
@@ -130,38 +180,54 @@ const TrialDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Participants</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Participants
+              </CardTitle>
               <Users className="w-4 h-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{aggregatedData.totalParticipants}</div>
+              <div className="text-2xl font-bold">
+                {aggregatedData.totalParticipants}
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Completed Visits</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Completed Visits
+              </CardTitle>
               <UserCheck className="w-4 h-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{aggregatedData.completedVisits}</div>
+              <div className="text-2xl font-bold">
+                {aggregatedData.completedVisits}
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Scheduled Visits</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Scheduled Visits
+              </CardTitle>
               <Calendar className="w-4 h-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{aggregatedData.scheduledVisits}</div>
+              <div className="text-2xl font-bold">
+                {aggregatedData.scheduledVisits}
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Avg Heart Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Avg Heart Rate
+              </CardTitle>
               <Activity className="w-4 h-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{aggregatedData.averageHeartRate}</div>
+              <div className="text-2xl font-bold">
+                {aggregatedData.averageHeartRate}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -185,8 +251,18 @@ const TrialDashboard = () => {
                       <XAxis dataKey="name" />
                       <YAxis />
                       <Tooltip />
-                      <Line type="monotone" dataKey="heartRate" stroke="#8884d8" name="Heart Rate" />
-                      <Line type="monotone" dataKey="bloodGlucose" stroke="#82ca9d" name="Blood Glucose" />
+                      <Line
+                        type="monotone"
+                        dataKey="heartRate"
+                        stroke="#8884d8"
+                        name="Heart Rate"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="bloodGlucose"
+                        stroke="#82ca9d"
+                        name="Blood Glucose"
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -198,10 +274,18 @@ const TrialDashboard = () => {
                 </CardHeader>
                 <CardContent className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={[
-                      { name: 'Completed', value: aggregatedData.completedVisits },
-                      { name: 'Scheduled', value: aggregatedData.scheduledVisits }
-                    ]}>
+                    <BarChart
+                      data={[
+                        {
+                          name: "Completed",
+                          value: aggregatedData.completedVisits,
+                        },
+                        {
+                          name: "Scheduled",
+                          value: aggregatedData.scheduledVisits,
+                        },
+                      ]}
+                    >
                       <XAxis dataKey="name" />
                       <YAxis />
                       <Tooltip />
@@ -220,18 +304,23 @@ const TrialDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="divide-y">
-                  {trialParticipants.map(participant => (
+                  {trialParticipants.map((participant) => (
                     <div key={participant.id} className="py-4">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="font-medium">{participant.full_name}</h3>
+                          <h3 className="font-medium">
+                            {participant.full_name}
+                          </h3>
                           <p className="text-sm text-gray-600">
-                            {participant.gender} • {new Date(participant.dob).toLocaleDateString()}
+                            {participant.gender} •{" "}
+                            {new Date(participant.dob).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm">{participant.email}</p>
-                          <p className="text-sm text-gray-600">{participant.phone_number}</p>
+                          <p className="text-sm text-gray-600">
+                            {participant.phone_number}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -248,20 +337,28 @@ const TrialDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {trialHealthData.map(data => (
+                  {trialHealthData.map((data) => (
                     <div key={data.id} className="p-4 border rounded-lg">
                       <div className="space-y-2">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Heart Rate:</span>
-                          <span className="font-medium">{data.heart_rate} bpm</span>
+                          <span className="font-medium">
+                            {data.heart_rate} bpm
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Blood Pressure:</span>
-                          <span className="font-medium">{data.blood_pressure}</span>
+                          <span className="font-medium">
+                            {data.blood_pressure}
+                          </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Oxygen Saturation:</span>
-                          <span className="font-medium">{Math.round(data.oxygen_saturation)}%</span>
+                          <span className="text-gray-600">
+                            Oxygen Saturation:
+                          </span>
+                          <span className="font-medium">
+                            {Math.round(data.oxygen_saturation)}%
+                          </span>
                         </div>
                       </div>
                     </div>

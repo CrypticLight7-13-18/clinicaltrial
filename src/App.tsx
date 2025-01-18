@@ -12,7 +12,7 @@ function App() {
         <Route
               path="/"
               element={
-                <AuthPages />
+                <TrialDashboard />
               }
             />        </Routes>
       </BrowserRouter>
