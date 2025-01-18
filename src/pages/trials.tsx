@@ -5,9 +5,46 @@ import { LineChart, BarChart, XAxis, YAxis, Tooltip, Bar, Line, ResponsiveContai
 import { Users, UserCheck, Activity, Calendar } from 'lucide-react';
 import { generateDummyData } from '@/lib/utils';
 
+interface Trial {
+    id: number;
+    title: string;
+    description: string;
+    start_date: string;
+}
+
+interface Participant {
+    id: number;
+    trial_id: number;
+    full_name: string;
+    gender: string;
+    dob: string;
+    email: string;
+    phone_number: string;
+}
+
+interface Visit {
+    id: number;
+    participant_id: number;
+    status: string;
+}
+
+interface HealthData {
+    id: number;
+    visit_id: number;
+    heart_rate: number;
+    blood_glucose_level: number;
+    oxygen_saturation: number;
+    weight: number;
+}
+
 const TrialDashboard = () => {
   const [selectedTrial, setSelectedTrial] = useState(null);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<{ trials: Trial[], participants: Participant[], visits: Visit[], healthData: HealthData[] }>({
+    trials: [],
+    participants: [],
+    visits: [],
+    healthData: []
+  });
 
   useEffect(() => {
     const generatedData = generateDummyData(10, 50);

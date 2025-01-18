@@ -9,7 +9,7 @@ function App() {
       // <AuthPages />
       // <CreateTrialPage />
       // <AddParticipantPage />
-      <TrialDashboard />
+      // <TrialDashboard />
   )
 }
 
