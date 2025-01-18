@@ -1,0 +1,1 @@
+The above are the structures of the Trials table and Users table. I wish to create a page where i can create a new trial and assign it to multiple users. Use dummy apis for the same
